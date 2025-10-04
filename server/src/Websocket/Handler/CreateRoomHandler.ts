@@ -1,4 +1,4 @@
-import HandlerInterface from "./HandlerInterface.ts";
+import type HandlerInterface from "./HandlerInterface.ts";
 
 export default class CreateRoomHandler implements HandlerInterface {
     messageType: string = 'create_room';

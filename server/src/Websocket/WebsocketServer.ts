@@ -1,5 +1,5 @@
 import {WebSocketServer} from 'ws';
-import HandlerInterface from './Handler/HandlerInterface.ts';
+import type HandlerInterface from './Handler/HandlerInterface.ts';
 import CreateRoomHandler from './Handler/CreateRoomHandler.ts';
 
 export default class WebsocketServer {
