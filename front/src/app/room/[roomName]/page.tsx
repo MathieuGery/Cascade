@@ -4,7 +4,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import MarbleIcon from '@/components/MarbleIcon';
 import { useRoomPlayers } from '@/hooks/useRoomPlayers';
-import { getPlayerName, clearRoomFromLocalStorage, closeWebSocketConnection } from '@/utils/websocket';
+import { closeWebSocketConnection } from '@/utils/websocket';
+import { clearRoomFromLocalStorage, getPlayerName } from '@/utils/localStorage';
 
 export default function RoomPage() {
   const params = useParams();

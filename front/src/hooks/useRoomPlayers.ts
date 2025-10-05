@@ -5,19 +5,10 @@ import {
   getRoomFromLocalStorage,
   saveRoomToLocalStorage,
   addPlayerToLocalStorage,
-  removePlayerFromLocalStorage
-} from '@/utils/websocket';
-
-interface Player {
-  name: string;
-}
-
-interface RoomData {
-  name: string;
-  players: Player[];
-  state: 'waiting' | 'in-game' | 'finished';
-  lastUpdated: number;
-}
+  removePlayerFromLocalStorage,
+  type Player,
+  type RoomData
+} from '@/utils/localStorage';
 
 /**
  * Hook personnalisé pour gérer les joueurs d'une room avec localStorage

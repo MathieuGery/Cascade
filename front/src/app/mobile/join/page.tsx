@@ -55,9 +55,13 @@ export default function MobileJoinPage() {
       console.log('Rejoindre la room:', { playerName, roomName });
       const joinRoomStatus = await joinRoom(roomName, playerName);
       if (!joinRoomStatus.success) {
-        setJoinError((joinRoomStatus.response.payload as any).error || 'Erreur lors de la connexion');
+        setJoinError((joinRoomStatus.response.payload as { error?: string }).error || 'Erreur lors de la connexion');
         return;
       }
+
+      // Redirection vers la page de statut de jeu après un join réussi
+      console.log('✅ Connexion réussie, redirection vers le statut de jeu');
+      router.push(`/mobile/game-status/${encodeURIComponent(roomName)}`);
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);
       setJoinError('Erreur lors de la connexion à la room');
