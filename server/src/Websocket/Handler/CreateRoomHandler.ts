@@ -1,30 +1,23 @@
 import type HandlerInterface from "./HandlerInterface.ts";
 import {Room} from "../../Room/Room.ts";
-import {WebSocket, WebSocketServer} from 'ws';
-import cache from '../../Utils/cache.ts';
-
-type CreateRoomPayload = {
-    roomName: string;
-}
+import {WebSocket} from 'ws';
+import roomManager from "../../Room/RoomManager.ts";
+import type CreateRoomMessage from "../Message/CreateRoomMessage.ts";
 
 export default class CreateRoomHandler implements HandlerInterface {
     messageType: string = 'create_room';
 
-    handle(payload: CreateRoomPayload, ws: WebSocket, wss: WebSocketServer): void {
-        if (cache.has('room-'+payload.roomName)) {
-            throw new Error('Room ' + payload.roomName + ' already exists');
+    handle(message: CreateRoomMessage, ws: WebSocket): void {
+        let room = roomManager.getRoomByName(message.payload.roomName);
+
+        if (room !== undefined) {
+            throw new Error('Room ' + message.payload.roomName + ' already exists');
         }
 
-        ws.addListener('join_room_'+payload.roomName, (data) => {
-            ws.send(JSON.stringify({
-                messageType: 'join_room',
-                payload: data,
-            }));
-        });
+        console.log('CreateRoomHandler received message:', message.payload);
 
-        console.log('CreateRoomHandler received payload:', payload);
+        room = new Room(message.payload.roomName, ws);
 
-        const room = new Room(payload.roomName);
-        room.save();
+        roomManager.addRoom(room);
     }
 }

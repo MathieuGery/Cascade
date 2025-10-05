@@ -1,47 +1,43 @@
 import type HandlerInterface from "./HandlerInterface.ts";
-import {Room, type RoomType} from "../../Room/Room.ts";
-import {WebSocket, WebSocketServer} from 'ws';
-import cache from '../../Utils/cache.ts';
-
-type JoinRoomPayload = {
-    roomName: string;
-    playerName: string;
-}
+import {WebSocket} from 'ws';
+import roomManager from "../../Room/RoomManager.ts";
+import type JoinRoomMessage from "../Message/JoinRoomMessage.ts";
 
 export default class JoinRoomHandler implements HandlerInterface {
     messageType: string = 'join_room';
 
-    handle(payload: JoinRoomPayload, ws: WebSocket, wss: WebSocketServer): void {
-        const roomData = cache.get('room-'+payload.roomName) as RoomType;
+    handle(message: JoinRoomMessage, ws: WebSocket): void {
+        const payload = message.payload;
+        const room = roomManager.getRoomByName(payload.roomName);
 
-        if (!roomData) {
+        if (!room) {
             throw new Error('Room ' + payload.roomName + ' does not exist');
         }
 
-        if (roomData.state !== 'waiting') {
+        if (room.data.state !== 'waiting') {
             throw new Error('Room ' + payload.roomName + ' is not in waiting state');
         }
 
-        if (roomData.players.find(p => p.name === payload.playerName)) {
+        if (room.data.players.find(p => p.name === payload.playerName)) {
             throw new Error('Player ' + payload.playerName + ' already in room ' + payload.roomName);
         }
 
         console.log('JoinRoomHandler received payload:', payload);
-        roomData.players.push({name: payload.playerName});
+        const response = {
+            messageType: 'join_room',
+            payload: {
+                roomName: payload.roomName,
+                playerName: payload.playerName
+            }
+        };
 
-        const room = new Room(payload.roomName, roomData.players, roomData.state);
+        room.data.host.send(JSON.stringify(response));
 
-        wss.clients.forEach((client: WebSocket) => {
-            client.emit('join_room_'+payload.roomName, payload);
+        room.data.players.forEach(player => {
+            player.ws.send(JSON.stringify(response));
         });
 
-        ws.addListener('join_room_'+payload.roomName, (data) => {
-            ws.send(JSON.stringify({
-                messageType: 'join_room',
-                payload: data,
-            }));
-        });
+        room.addPlayer({name: payload.playerName, ws});
 
-        room.save();
     }
 }

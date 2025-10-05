@@ -56,7 +56,7 @@ export default class WebsocketServer {
 
         if (handler) {
             try {
-                handler.handle(parsedMessage.payload, ws, this.wss);
+                handler.handle(parsedMessage, ws);
 
                 console.log('Handled successfully message of type : ' + messageType);
 
@@ -93,5 +93,4 @@ export default class WebsocketServer {
 
         ws.send(JSON.stringify(successMessage));
     }
-
 }

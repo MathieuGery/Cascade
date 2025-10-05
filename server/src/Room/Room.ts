@@ -1,5 +1,5 @@
-import cache from '../Utils/cache.ts';
 import type Player from "./Player";
+import {WebSocket} from "ws";
 
 type RoomState = 'waiting' | 'in-game' | 'finished';
 
@@ -7,25 +7,22 @@ export type RoomType = {
     name: string;
     players: Player[];
     state: RoomState;
+    host: WebSocket;
 }
 
 export class Room {
     data: RoomType;
 
-    constructor(name: string, players: string[] = [], state: RoomState = 'waiting') {
+    constructor(name: string, host: WebSocket, players: Player[] = [], state: RoomState = 'waiting') {
         this.data = {
             name,
             players,
             state,
+            host
         };
     }
 
-    public save() {
-        cache.set('room-'+this.data.name, this.data);
-        console.log('Room saved: ', this.data);
-
-        const data = cache.get('room-'+this.data.name);
-
-        console.log('data : ' + JSON.stringify(data));
+    public addPlayer(player: Player): void {
+        this.data.players.push(player);
     }
 }
