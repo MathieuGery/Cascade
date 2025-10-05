@@ -25,4 +25,12 @@ export class Room {
     public addPlayer(player: Player): void {
         this.data.players.push(player);
     }
+
+    public broadcast(message: string): void {
+        this.data.players.forEach(player => {
+            player.ws.send(message);
+        });
+
+        this.data.host.send(message);
+    }
 }

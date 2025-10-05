@@ -31,13 +31,7 @@ export default class JoinRoomHandler implements HandlerInterface {
             }
         };
 
-        room.data.host.send(JSON.stringify(response));
-
-        room.data.players.forEach(player => {
-            player.ws.send(JSON.stringify(response));
-        });
-
+        room.broadcast(JSON.stringify(response));
         room.addPlayer({name: payload.playerName, ws});
-
     }
 }
