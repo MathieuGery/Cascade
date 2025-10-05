@@ -4,6 +4,7 @@ import CreateRoomHandler from './Handler/CreateRoomHandler.ts';
 import type ErrorMessage from "./Message/ErrorMessage.ts";
 import type SuccessMessage from "./Message/SuccessMessage.ts";
 import JoinRoomHandler from "./Handler/JoinRoomHandler.ts";
+import StartGameHandler from "./Handler/StartGameHandler.ts";
 
 export default class WebsocketServer {
     wss: WebSocketServer;
@@ -20,6 +21,7 @@ export default class WebsocketServer {
     private registerMessages(): void {
         this.handlers.push(new CreateRoomHandler());
         this.handlers.push(new JoinRoomHandler());
+        this.handlers.push(new StartGameHandler());
     }
 
     public initServer(): void {
