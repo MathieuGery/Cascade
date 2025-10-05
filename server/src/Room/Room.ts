@@ -1,19 +1,31 @@
-import {randomBytes} from 'node:crypto';
+import cache from '../Utils/cache.ts';
+import type Player from "./Player";
 
-export default class Room {
-    id: string;
+type RoomState = 'waiting' | 'in-game' | 'finished';
 
-    constructor() {
-        this.init();
+export type RoomType = {
+    name: string;
+    players: Player[];
+    state: RoomState;
+}
+
+export class Room {
+    data: RoomType;
+
+    constructor(name: string, players: string[] = [], state: RoomState = 'waiting') {
+        this.data = {
+            name,
+            players,
+            state,
+        };
     }
 
-    private generateRoomId(): string {
-        return randomBytes(16).toString('hex');
-    }
+    public save() {
+        cache.set('room-'+this.data.name, this.data);
+        console.log('Room saved: ', this.data);
 
-    private init() {
-        this.id = this.generateRoomId();
+        const data = cache.get('room-'+this.data.name);
 
-        console.log('Room ID: ', this.id);
+        console.log('data : ' + JSON.stringify(data));
     }
 }
