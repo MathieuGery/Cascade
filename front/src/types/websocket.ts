@@ -4,6 +4,11 @@ export type WebSocketMessage = {
 }
 
 export type WebSocketResponseMessage = {
-  messageType: "success" | "error";
-  payload: object;
+  messageType: 'success' | 'error' | 'join_room';
+  payload: object | PlayerJoinedRoom;
 };
+
+export type PlayerJoinedRoom = {
+  roomName: string;
+  playerName: string;
+}
