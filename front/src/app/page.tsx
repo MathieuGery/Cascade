@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MarbleIcon from '@/components/MarbleIcon';
 import validateRoomName from '@/utils/validateRoomName';
+import { createRoom } from '@/utils/websocket';
 
 export default function Home() {
   const [roomName, setRoomName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const [creationError, setCreationError] = useState('');
   const router = useRouter();
 
   const handleRoomNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,6 +19,7 @@ export default function Home() {
     if (value === '' || validateRoomName(value)) {
       setRoomName(value);
       setValidationError('');
+      setCreationError(''); // Réinitialiser l'erreur de création
     } else {
       setValidationError('Seules les lettres et les chiffres sont autorisés');
     }
@@ -27,16 +30,32 @@ export default function Home() {
     if (!roomName.trim() || !validateRoomName(roomName) || validationError) return;
 
     setIsLoading(true);
+    setCreationError(''); // Réinitialiser l'erreur précédente
 
     try {
       console.log('Création de la room:', roomName);
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Envoyer un message WebSocket au serveur
+      const creationRoomStatus: boolean = await createRoom(roomName);
 
-      router.push(`/room/${encodeURIComponent(roomName.trim())}`);
+      console.log('Statut de la création de la room:', creationRoomStatus);
+      // Si on arrive ici, la connexion WebSocket a réussi
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!creationRoomStatus) {
+        setCreationError('Erreur lors de la création de la room : le nom est peut-être déjà pris.');
+        return;
+      } else {
+        router.push(`/room/${encodeURIComponent(roomName.trim())}`);
+      }
     } catch (error) {
       console.error('Erreur lors de la création de la room:', error);
-      alert('Erreur lors de la création de la room');
+
+      // Afficher un message d'erreur spécifique selon le type d'erreur
+      if (error instanceof Error && error.message.includes('WebSocket')) {
+        setCreationError('Impossible de se connecter au serveur. Vérifiez que le serveur est démarré.');
+      } else {
+        setCreationError('Erreur lors de la création de la room');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -62,8 +81,8 @@ export default function Home() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label 
-                htmlFor="roomName" 
+              <label
+                htmlFor="roomName"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
                 Nom de la room
@@ -75,8 +94,8 @@ export default function Home() {
                 onChange={handleRoomNameChange}
                 placeholder="MonSuperJeu123"
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors ${
-                  validationError 
-                    ? 'border-red-500 dark:border-red-400 focus:ring-red-500' 
+                  validationError
+                    ? 'border-red-500 dark:border-red-400 focus:ring-red-500'
                     : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
                 }`}
                 required
@@ -107,6 +126,25 @@ export default function Home() {
                 'Créer la room'
               )}
             </button>
+
+            {/* Affichage des erreurs de création */}
+            {creationError && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <span className="text-red-400 text-lg">⚠️</span>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                      Erreur de création
+                    </h3>
+                    <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                      {creationError}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
         </div>
       </div>

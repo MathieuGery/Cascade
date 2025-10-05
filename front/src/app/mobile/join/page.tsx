@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import MarbleIcon from '@/components/MarbleIcon';
 import validateRoomName from '@/utils/validateRoomName';
+import { joinRoom } from '@/utils/websocket';
 
 export default function MobileJoinPage() {
   const [playerName, setPlayerName] = useState('');
   const [roomName, setRoomName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [joinError, setJoinError] = useState('');
   const [validationErrors, setValidationErrors] = useState({ player: '', room: '' });
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,11 +53,14 @@ export default function MobileJoinPage() {
 
     try {
       console.log('Rejoindre la room:', { playerName, roomName });
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      alert('Room rejointe ! (simulation)');
+      const joinRoomStatus = await joinRoom(roomName, playerName);
+      if (!joinRoomStatus.success) {
+        setJoinError((joinRoomStatus.response.payload as any).error || 'Erreur lors de la connexion');
+        return;
+      }
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);
-      alert('Erreur lors de la connexion à la room');
+      setJoinError('Erreur lors de la connexion à la room');
     } finally {
       setIsLoading(false);
     }
@@ -169,6 +174,24 @@ export default function MobileJoinPage() {
                 '🚀 Rejoindre la course !'
               )}
             </button>
+            {/* Affichage des erreurs de connexion */}
+            {joinError && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <span className="text-red-400 text-lg">⚠️</span>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                      Erreur de connexion
+                    </h3>
+                    <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                      {joinError}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
         </div>
 

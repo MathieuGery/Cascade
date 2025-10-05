@@ -12,11 +12,8 @@ export default function RoomPage() {
   const [players, setPlayers] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log(`Connexion à la room: ${roomName}`);
-
     setTimeout(() => {
       setIsConnected(true);
-      setPlayers(['Joueur 1']);
     }, 1000);
   }, [roomName]);
 

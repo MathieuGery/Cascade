@@ -30,7 +30,7 @@ export default class WebsocketServer {
         });
     }
 
-    private processMessage(message: RawData): void {
+    private processMessage(message): void {
         console.log('received: %s', message);
 
         const parsedMessage = JSON.parse(message.toString());
