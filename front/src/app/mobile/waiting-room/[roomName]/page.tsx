@@ -37,6 +37,14 @@ export default function MobileGameStatusPage() {
     }, 1000);
   }, [roomName, players, playersLoading, router]);
 
+  // Redirection automatique vers la page de jeu mobile quand la partie commence
+  useEffect(() => {
+    if (roomData?.state === 'in-game' && !isLoading) {
+      console.log('🎮 Jeu commencé, redirection vers la page de jeu mobile');
+      router.push(`/mobile/game/${roomName}`);
+    }
+  }, [roomData?.state, isLoading, router, roomName]);
+
   const handleLeaveRoom = () => {
     // Retourner à la page de join
     router.push('/mobile/join');

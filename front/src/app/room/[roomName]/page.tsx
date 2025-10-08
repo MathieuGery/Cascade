@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import MarbleIcon from '@/components/MarbleIcon';
 import { useRoomPlayers } from '@/hooks/useRoomPlayers';
-import { closeWebSocketConnection } from '@/utils/websocket';
+import { closeWebSocketConnection, startGame } from '@/utils/websocket';
 import { clearRoomFromLocalStorage, getPlayerName } from '@/utils/localStorage';
 
 export default function RoomPage() {
@@ -47,6 +47,22 @@ export default function RoomPage() {
       console.error('❌ Erreur lors de la sortie de la room:', error);
       // Naviguer quand même vers la page d'accueil
       router.push('/');
+    }
+  };
+
+  const handleStartGame = async () => {
+    try {
+      console.log('Tentative de démarrage du jeu pour la room:', roomName);
+      const success = await startGame(roomName);
+      if (success) {
+        console.log('✅ Jeu démarré avec succès');
+        // Rediriger vers la page de jeu
+        router.push(`/game/${roomName}`);
+      } else {
+        console.error('❌ Échec du démarrage du jeu');
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors du démarrage du jeu:', error);
     }
   };
 
@@ -156,6 +172,7 @@ export default function RoomPage() {
 
               {/* Bouton pour démarrer la course */}
               <button
+                onClick={handleStartGame}
                 disabled={playerCount < 2 || roomData?.state !== 'waiting'}
                 className="w-full mt-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100"
               >

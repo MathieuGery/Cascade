@@ -2,6 +2,7 @@ import { WebSocketResponseMessage, WebSocketMessage } from "@/types/websocket";
 import {
   addPlayerToLocalStorage,
   saveRoomToLocalStorage,
+  startMobileGame,
   type RoomData
 } from './localStorage';
 
@@ -64,6 +65,9 @@ export const getWebSocketConnection = (): Promise<WebSocket> => {
         }
         if (message.messageType === 'join_room' && typeof message.payload === 'object' && message.payload !== null && 'playerName' in message.payload && 'roomName' in message.payload) {
           addPlayerToLocalStorage(message.payload.playerName, message.payload.roomName);
+        }
+        if (message.messageType === 'start_game' && typeof message.payload === 'object' && message.payload !== null && 'roomName' in message.payload) {
+          startMobileGame(message.payload.roomName);
         }
       };
 
@@ -245,6 +249,31 @@ export const joinRoom = async (roomName: string, playerName: string): Promise<{ 
   if (response.messageType === 'error')
     return { success: false, response }
   return { success: true, response }
+};
+
+export const startGame = async (roomName: string): Promise<boolean> => {
+  const message: WebSocketMessage = {
+    messageType: 'start_game',
+    payload: {
+      roomName: roomName.trim()
+    }
+  };
+
+  try {
+    await sendWebSocketMessage(message);
+    console.log('Démarrage du jeu pour la room:', roomName);
+  } catch (error) {
+    console.error('Erreur lors du démarrage du jeu:', error);
+    throw error;
+  }
+  const response: WebSocketResponseMessage = await getWebSocketMessage();
+  console.log('Message reçu après démarrage du jeu:', response);
+
+  if (response.messageType === 'error') {
+    return false;
+  }
+
+  return true;
 };
 
 // // Réexports des fonctions localStorage pour maintenir la compatibilité

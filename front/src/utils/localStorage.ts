@@ -112,6 +112,14 @@ export const addPlayerToLocalStorage = (playerName: string, roomName?: string): 
   }
 };
 
+export const startMobileGame = (roomName: string): void => {
+    const roomData = getRoomFromLocalStorage(roomName);
+    console.log(roomData)
+    if (roomData) {
+      roomData.state = 'in-game';
+      saveRoomToLocalStorage(roomData);
+    }
+}
 /**
  * Retire un joueur de la room dans le localStorage
  * @param playerName - Le nom du joueur à retirer
