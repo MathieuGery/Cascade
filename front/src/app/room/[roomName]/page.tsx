@@ -95,7 +95,6 @@ export default function RoomPage() {
 
       {/* Zone de jeu principale */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Panneau des joueurs */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
@@ -173,7 +172,6 @@ export default function RoomPage() {
               )}
             </div>
           </div>
-        </div>
       </main>
     </div>
   );

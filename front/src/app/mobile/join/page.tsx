@@ -59,9 +59,9 @@ export default function MobileJoinPage() {
         return;
       }
 
-      // Redirection vers la page de statut de jeu après un join réussi
-      console.log('✅ Connexion réussie, redirection vers le statut de jeu');
-      router.push(`/mobile/game-status/${encodeURIComponent(roomName)}`);
+      // Redirection vers la page de salle d'attente après un join réussi
+      console.log('✅ Connexion réussie, redirection vers la salle d\'attente');
+      router.push(`/mobile/waiting-room/${encodeURIComponent(roomName)}`);
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);
       setJoinError('Erreur lors de la connexion à la room');

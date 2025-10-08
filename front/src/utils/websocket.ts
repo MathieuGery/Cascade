@@ -6,7 +6,7 @@ import {
 } from './localStorage';
 
 // Utilitaire pour gérer les communications WebSocket avec le serveur
-const WEBSOCKET_URL = 'ws://10.87.205.20:8080';
+const WEBSOCKET_URL = 'ws://localhost:8080';
 //const WEBSOCKET_URL = 'ws://localhost:8080';
 
 // Instance globale de WebSocket pour maintenir la connexion
